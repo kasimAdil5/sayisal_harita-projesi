@@ -60,9 +60,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit;
     }
 
-    // Hash the password
-    $passwordHash = password_hash($password, PASSWORD_DEFAULT);
-
     // Insert user into database
     $insertSql = "INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)";
     $insertStmt = mysqli_prepare($conn, $insertSql);
@@ -76,7 +73,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode($response);
         exit;
     }
-    mysqli_stmt_bind_param($insertStmt, "sss", $fullname, $email, $passwordHash);
+    mysqli_stmt_bind_param($insertStmt, "sss", $fullname, $email, $password);
 
     if (mysqli_stmt_execute($insertStmt)) {
         $response = array(
@@ -176,7 +173,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 <body>
     <div class="container">
-        <form id="registrationForm" action="registration.php" method="POST">
+        <form id="registrationForm" action="" method="POST">
             <div class="form-group">
                 <input type="text" class="form-control" name="fullname" placeholder="Adınız Soyadınız:" required>
             </div>
@@ -206,14 +203,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             var formData = new FormData(this);
     
             // AJAX request to handle registration
-            fetch('registration.php', {
+            fetch('', {
                 method: 'POST',
                 body: formData
             })
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    window.location.href = 'login.php   '; // Redirect on successful registration
+                    window.location.href = 'login.php'; // Redirect on successful registration
                 } else {
                     console.log(data.message); // Log error message (optional)
                     alert(data.message); // Show error message

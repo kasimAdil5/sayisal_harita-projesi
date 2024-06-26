@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
 -- Örnek bir kullanıcı ekleyelim (opsiyonel)
 -- Not: Şifreler password_hash ile hashlenmiş olmalıdır.
 INSERT INTO users (full_name, email, password) VALUES
-('John Doe', 'john@gmail.com', '$2y$10$eBHK/PZfJS5/uNkO8T.XKuFub/vq1so3gJoI2/Xu9duLP8rB0I1kW'), -- Şifre: password
-('Doe', 'doe@gmail.com', '$2y$10$eBHK/PZfJS5/uNkO8T.XKuFub/vq1so3gJoI2/Xu9duLP8rB0I1kW'), -- Şifre: password
-('test', 'test@gmail.com', '$2y$10$eBHK/PZfJS5/uNkO8T.XKuFub/vq1so3gJoI2/Xu9duLP8rB0I1kW'), -- Şifre: password
-('test2', 'test2@gmail.com', '$2y$10$eBHK/PZfJS5/uNkO8T.XKuFub/vq1so3gJoI2/Xu9duLP8rB0I1kW'), -- Şifre: password
-('test3', 'test3@gmail.com', '$2y$10$eBHK/PZfJS5/uNkO8T.XKuFub/vq1so3gJoI2/Xu9duLP8rB0I1kW'); -- Şifre: password
+('John Doe', 'john@gmail.com', 'test'), -- Şifre: password
+('Doe', 'doe@gmail.com', 'test'), -- Şifre: password
+('test', 'test@gmail.com', 'test'), -- Şifre: password
+('test2', 'test2@gmail.com', 'test'), -- Şifre: password
+('test3', 'test3@gmail.com', 'test'); -- Şifre: password

@@ -1,98 +1,85 @@
 <?php
+session_start();
+
 ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 
-// Database connection (adjust as per your database setup)
+// Veritabanı bağlantısı (veritabanı ayarlarınıza göre düzenleyin)
 require_once "database.php";
 
-// Check if the request method is POST
+// Fazladan çıktı olmadığından emin olun
+ob_start();
+
+// İstek yöntemi POST ise
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Form data retrieval
+    // Form verilerini alın
     $fullname = trim($_POST['fullname']);
     $email = trim($_POST['email']);
     $password = $_POST['password'];
     $repeat_password = $_POST['repeat_password'];
 
-    // Data validation
+    // Veri doğrulama
     $errors = array();
 
     if (empty($fullname) || empty($email) || empty($password) || empty($repeat_password)) {
-        $errors[] = "All fields are required.";
+        $errors[] = "Tüm alanlar gereklidir.";
     }
 
     if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-        $errors[] = "Invalid email format.";
+        $errors[] = "Geçersiz e-posta formatı.";
     }
 
     if ($password !== $repeat_password) {
-        $errors[] = "Passwords do not match.";
+        $errors[] = "Şifreler uyuşmuyor.";
     }
 
     if (strlen($password) < 8) {
-        $errors[] = "Password must be at least 8 characters long.";
+        $errors[] = "Şifre en az 8 karakter uzunluğunda olmalıdır.";
     }
 
-    // Check if email already exists in the database
+    // E-posta zaten veritabanında var mı kontrol edin
     $sql = "SELECT * FROM users WHERE email = ?";
     $stmt = mysqli_prepare($conn, $sql);
     if ($stmt === false) {
-        $errors[] = 'mysqli prepare error: ' . mysqli_error($conn);
+        $errors[] = 'MySQL hazırlık hatası: ' . mysqli_error($conn);
     } else {
         mysqli_stmt_bind_param($stmt, "s", $email);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
 
         if (mysqli_num_rows($result) > 0) {
-            $errors[] = "Email already exists.";
+            $errors[] = "E-posta zaten mevcut.";
         }
     }
 
-    // Return error message in JSON format if there are errors
+    // Hatalar varsa hata mesajını göster ve çık
     if (!empty($errors)) {
-        http_response_code(400);
-        header('Content-Type: application/json');
-        $response = array(
-            'success' => false,
-            'message' => implode(" ", $errors)
-        );
-        echo json_encode($response);
+        echo '<div class="error-message">' . implode(" ", $errors) . '</div>';
         exit;
     }
 
-    // Insert user into database
+    // Kullanıcıyı veritabanına ekleyin
     $insertSql = "INSERT INTO users (full_name, email, password) VALUES (?, ?, ?)";
     $insertStmt = mysqli_prepare($conn, $insertSql);
     if ($insertStmt === false) {
-        http_response_code(500);
-        header('Content-Type: application/json');
-        $response = array(
-            'success' => false,
-            'message' => 'mysqli prepare error: ' . mysqli_error($conn)
-        );
-        echo json_encode($response);
+        echo '<div class="error-message">MySQL hazırlık hatası: ' . mysqli_error($conn) . '</div>';
         exit;
     }
     mysqli_stmt_bind_param($insertStmt, "sss", $fullname, $email, $password);
 
     if (mysqli_stmt_execute($insertStmt)) {
-        $response = array(
-            'success' => true   
-        );
-        echo json_encode($response);
+        $_SESSION['success_message'] = "Kayıt başarılı. Lütfen giriş yapın.";
+        header('Location: login.php');
+        exit();
     } else {
-        http_response_code(500);
-        header('Content-Type: application/json');
-        $response = array(
-            'success' => false,
-            'message' => "Error: " . mysqli_error($conn)
-        );
-        echo json_encode($response);
+        echo '<div class="error-message">Hata: ' . mysqli_error($conn) . '</div>';
     }
 
-    // Close statements and connection
+    // İfadeleri ve bağlantıyı kapatın
     mysqli_stmt_close($insertStmt);
     mysqli_close($conn);
+    ob_end_flush();
 }
 ?>
 
@@ -106,7 +93,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.2/dist/css/bootstrap.min.css" integrity="sha384-Zenh87qX5JnK2Jl0vWa8Ck2rdkQ2Bzep5IDxbcnCeuOxjzrPF/et3URy9Bv1WTRi" crossorigin="anonymous">
     
     <style>
-        /* Bootstrap defaults overridden */
+        /* Bootstrap varsayılanlarını geçersiz kıl */
         body {
             font-family: 'Roboto', sans-serif;
             padding-top: 50px;
@@ -164,6 +151,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             margin-top: 5px;
         }
 
+        .success-message {
+            color: #2ecc71;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
         @media (max-width: 576px) {
             .container {
                 padding: 15px;
@@ -194,33 +187,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <p>Zaten kayıtlı mı? <a href="login.php">Buradan giriş yapın</a></p>
         </div>
     </div>
-    
-    <script>
-        document.getElementById('registrationForm').addEventListener('submit', function(event) {
-            event.preventDefault(); // Form submission prevented
-    
-            // Form data
-            var formData = new FormData(this);
-    
-            // AJAX request to handle registration
-            fetch('', {
-                method: 'POST',
-                body: formData
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = 'login.php'; // Redirect on successful registration
-                } else {
-                    console.log(data.message); // Log error message (optional)
-                    alert(data.message); // Show error message
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('An error occurred. Please try again.'); // Alert on AJAX error
-            });
-        });
-    </script>
 </body>
 </html>

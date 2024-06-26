@@ -13,8 +13,8 @@ CREATE TABLE IF NOT EXISTS users (
 -- Örnek bir kullanıcı ekleyelim (opsiyonel)
 -- Not: Şifreler password_hash ile hashlenmiş olmalıdır.
 INSERT INTO users (full_name, email, password) VALUES
-('John Doe', 'john@gmail.com', 'test'), -- Şifre: password
-('Doe', 'doe@gmail.com', 'test'), -- Şifre: password
-('test', 'test@gmail.com', 'test'), -- Şifre: password
-('test2', 'test2@gmail.com', 'test'), -- Şifre: password
-('test3', 'test3@gmail.com', 'test'); -- Şifre: password
+('John Doe', 'john@gmail.com', 'test1234'), -- Şifre: password
+('Doe', 'doe@gmail.com', 'test1234'), -- Şifre: password
+('test', 'test@gmail.com', 'test1234'), -- Şifre: password
+('test2', 'test2@gmail.com', 'test1234'), -- Şifre: password
+('test3', 'test3@gmail.com', 'test1234'); -- Şifre: password

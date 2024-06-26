@@ -2,9 +2,9 @@
 $servername = "localhost";
 $username = "root";
 $password = ""; // Varsayılan şifre boşsa
-
+$dbname = "login_registration";
 // Veritabanı bağlantısı oluşturma
-$conn = new mysqli($servername, $username, $password);
+$conn = new mysqli($servername, $username, $password,$dbname );
 
 // Bağlantı kontrolü
 if ($conn->connect_error) {

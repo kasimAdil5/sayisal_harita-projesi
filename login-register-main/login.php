@@ -67,7 +67,7 @@ if (isset($_SESSION['success_message'])) {
         body {
             font-family: 'Roboto', sans-serif;
             padding-top: 50px;
-            background: url('pexels-dreamypixel-547114.jpg') no-repeat center center fixed;
+            background: url('background.jpg') no-repeat center center fixed;
             background-size: cover;
         }
 
